@@ -2,15 +2,15 @@ package controller;
 
 import db.DBConnection;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.IOException;
+import java.sql.*;
 
 public class CreateNewAccountFormController {
     public PasswordField txtNewPassword;
@@ -22,6 +22,7 @@ public class CreateNewAccountFormController {
     public Button btnRegister;
     public Label lblId;
     public Button btnAddNewUser;
+    public AnchorPane root1;
 
     public  void initialize(){
         setLblVisibility(false);
@@ -35,6 +36,8 @@ public class CreateNewAccountFormController {
 
             setLblVisibility(false);
             setBorderColor("transparent");
+
+            register();
 
         }else{
             setBorderColor("red");
@@ -88,6 +91,36 @@ public class CreateNewAccountFormController {
                 lblId.setText("U001");
             }
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void register(){
+        Connection connection = DBConnection.getInstance().getConnection();
+        String id = lblId.getText();
+        String userName = txtUserName.getText();
+        String email = txtEmail.getText();
+        String password = txtConfirmPassword.getText();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO user VALUES (?,?,?,?)");
+            preparedStatement.setObject(1, id);
+            preparedStatement.setObject(2,userName);
+            preparedStatement.setObject(3,email);
+            preparedStatement.setObject(4,password);
+
+            int i = preparedStatement.executeUpdate();
+            if (i!= 0){
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"Success...!");
+                alert.showAndWait();
+                Parent parent = FXMLLoader.load(this.getClass().getResource("/view/LoginForm.fxml"));
+                Scene scene = new Scene(parent);
+
+                Stage primaryStage = (Stage) root1.getScene().getWindow();
+                primaryStage.setScene(scene);
+                primaryStage.setTitle("Login Form");
+                primaryStage.centerOnScreen();
+            }
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
     }
