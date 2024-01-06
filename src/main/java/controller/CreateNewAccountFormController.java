@@ -22,7 +22,7 @@ public class CreateNewAccountFormController {
     public Button btnRegister;
     public Label lblId;
     public Button btnAddNewUser;
-    public AnchorPane root1;
+    public AnchorPane   root1;
 
     public  void initialize(){
         setLblVisibility(false);
