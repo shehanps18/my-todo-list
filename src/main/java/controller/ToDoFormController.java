@@ -1,6 +1,8 @@
 package controller;
 
 import db.DBConnection;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +24,9 @@ public class ToDoFormController {
     public AnchorPane subRoot;
     public TextField txtDescription;
     public ListView<ToDoTm> lstToDo;
+    public TextField txtSelectedToDo;
+    public Button btnUpdate;
+    public Button btnDelete;
 
     public void initialize() {
         lblBanner.setText("Hi " + LoginFormController.loginUserName + " Welcome to To-Do-List");
@@ -29,7 +34,26 @@ public class ToDoFormController {
         subRoot.setVisible(false);
 
         loadList();
+        setDisableCommon(true);
 
+        lstToDo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ToDoTm>() {
+            @Override
+            public void changed(ObservableValue<? extends ToDoTm> observableValue, ToDoTm toDoTm, ToDoTm t1) {
+                setDisableCommon(false);
+                subRoot.setVisible(false);
+                ObservableList<ToDoTm> selectedItems = lstToDo.getSelectionModel().getSelectedItems();
+                if (selectedItems == null){
+                    return;
+              }
+                txtSelectedToDo.setText(selectedItems.iterator().next().getDescription());
+
+            }
+        });
+    }
+    public  void setDisableCommon(boolean isDisable){
+        btnDelete.setDisable(isDisable);
+        btnUpdate.setDisable(isDisable);
+        txtSelectedToDo.setDisable(isDisable);
     }
 
     public void btnLogOutOnAction(ActionEvent actionEvent) throws IOException {
@@ -48,8 +72,11 @@ public class ToDoFormController {
     }
 
     public void btnAddNewToDoOnAction() {
-        subRoot.setVisible(true);
+        lstToDo.getSelectionModel().clearSelection();
+        setDisableCommon(true);
         txtDescription.requestFocus();
+        subRoot.setVisible(true);
+
     }
 
 
