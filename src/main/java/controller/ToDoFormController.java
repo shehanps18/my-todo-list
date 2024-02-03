@@ -27,6 +27,7 @@ public class ToDoFormController {
     public TextField txtSelectedToDo;
     public Button btnUpdate;
     public Button btnDelete;
+    public String selectedId = null ;
 
     public void initialize() {
         lblBanner.setText("Hi " + LoginFormController.loginUserName + " Welcome to To-Do-List");
@@ -42,10 +43,14 @@ public class ToDoFormController {
                 setDisableCommon(false);
                 subRoot.setVisible(false);
                 ObservableList<ToDoTm> selectedItems = lstToDo.getSelectionModel().getSelectedItems();
-                if (selectedItems == null){
-                    return;
-              }
-                txtSelectedToDo.setText(selectedItems.iterator().next().getDescription());
+                if (!selectedItems.isEmpty()) {
+                    ToDoTm selectedItem = selectedItems.get(0);
+                    txtSelectedToDo.setText(selectedItem.getDescription());
+                    selectedId = selectedItem.getId();
+                }else {
+                    txtSelectedToDo.clear();
+                    selectedId = null;
+                }
 
             }
         });
@@ -153,6 +158,42 @@ public class ToDoFormController {
             lstToDo.refresh();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void btnUpdateOnAction(ActionEvent actionEvent) {
+        String selectedText = txtSelectedToDo.getText();
+        Connection connection = DBConnection.getInstance().getConnection();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("update todo set description = ? where id = ?");
+            preparedStatement.setObject(1,selectedText);
+            preparedStatement.setObject(2,selectedId);
+            preparedStatement.executeUpdate();
+
+            loadList();
+            txtSelectedToDo.clear();
+
+            setDisableCommon(true);
+        }  catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public void btnDeleteOnAction(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"Do you want to Delete this...?",ButtonType.YES,ButtonType.NO);
+        Optional<ButtonType> buttonType = alert.showAndWait();
+        if (buttonType.get().equals(ButtonType.YES)){
+            Connection connection = DBConnection.getInstance().getConnection();
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement("delete from todo where id = ?");
+                preparedStatement.setObject(1,selectedId);
+                preparedStatement.executeUpdate();
+                loadList();
+                txtSelectedToDo.clear();
+                setDisableCommon(true);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
