@@ -101,6 +101,7 @@ public class ToDoFormController {
             preparedStatement.setObject(3, userid);
             preparedStatement.executeUpdate();
             txtDescription.clear();
+            loadList();
             subRoot.setVisible(false);
         } catch (SQLException throwables) {
             throwables.printStackTrace();

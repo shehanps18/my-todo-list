@@ -44,37 +44,44 @@ public class LoginFormController {
     }
 
     public void logIn(){
-        String userName =  txtUserName.getText();
-        String password =   txtPassword.getText();
+        if (txtUserName.getText().trim().isEmpty()){
+            txtUserName.requestFocus();
+        } else if (txtPassword.getText().trim().isEmpty()) {
+            txtPassword.requestFocus();
+        }else {
+            String userName =  txtUserName.getText();
+            String password =   txtPassword.getText();
 
-        Connection connection = DBConnection.getInstance().getConnection();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT *FROM user WHERE userName = ? AND password = ?");
-            preparedStatement.setObject(1, userName);
-            preparedStatement.setObject(2,password);
-            ResultSet resultSet = preparedStatement.executeQuery();
+            Connection connection = DBConnection.getInstance().getConnection();
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT *FROM user WHERE userName = ? AND password = ?");
+                preparedStatement.setObject(1, userName);
+                preparedStatement.setObject(2,password);
+                ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (resultSet.next()){
-                loginUserName = resultSet.getString(2);
-                loginUserID = resultSet.getString(1);
+                if (resultSet.next()){
+                    loginUserName = resultSet.getString(2);
+                    loginUserID = resultSet.getString(1);
 
-                Parent parent = FXMLLoader.load(this.getClass().getResource("/view/ToDoForm.fxml"));
-                Scene scene = new Scene(parent);
-                Stage primaryStage = (Stage) root.getScene().getWindow();
-                primaryStage.setScene(scene);
-                primaryStage.setTitle("To Do Form");
-                primaryStage.centerOnScreen();
-            }else {
-                Alert alert = new Alert(Alert.AlertType.ERROR,"User name or Password Does not match...!");
-                alert.show();
-                txtUserName.clear();
-                txtPassword.clear();
+                    Parent parent = FXMLLoader.load(this.getClass().getResource("/view/ToDoForm.fxml"));
+                    Scene scene = new Scene(parent);
+                    Stage primaryStage = (Stage) root.getScene().getWindow();
+                    primaryStage.setScene(scene);
+                    primaryStage.setTitle("To Do Form");
+                    primaryStage.centerOnScreen();
+                }else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR,"User name or Password Does not match...!");
+                    alert.show();
+                    txtUserName.clear();
+                    txtPassword.clear();
 
-                txtUserName.requestFocus();
+                    txtUserName.requestFocus();
+                }
+            } catch (SQLException | IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
         }
+
     }
 
     public void passwordOnAction(ActionEvent actionEvent) {

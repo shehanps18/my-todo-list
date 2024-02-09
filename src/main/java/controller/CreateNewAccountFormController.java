@@ -29,22 +29,37 @@ public class CreateNewAccountFormController {
         setDisableCommon(true);
     }
     public void registerBtnOnAction(ActionEvent actionEvent) {
-        String newPassword = txtNewPassword.getText();
-        String confirmPassword = txtConfirmPassword.getText();
 
-        if (newPassword.equals(confirmPassword)){
-
-            setLblVisibility(false);
-            setBorderColor("transparent");
-
-            register();
-
-        }else{
-            setBorderColor("red");
-
-            setLblVisibility(true);
+        if (txtUserName.getText().trim().isEmpty()){
+            txtUserName.requestFocus();
+        } else if (txtEmail.getText().trim().isEmpty()) {
+            txtEmail.requestFocus();
+        } else if (txtNewPassword.getText().trim().isEmpty()) {
             txtNewPassword.requestFocus();
+        } else if (txtConfirmPassword.getText().trim().isEmpty()) {
+            txtConfirmPassword.requestFocus();
+        }else{
+            String newPassword = txtNewPassword.getText();
+            String confirmPassword = txtConfirmPassword.getText();
+
+            if (newPassword.equals(confirmPassword)){
+
+                setLblVisibility(false);
+                setBorderColor("transparent");
+
+                register();
+
+            }else{
+                setBorderColor("red");
+
+                setLblVisibility(true);
+                txtNewPassword.requestFocus();
+            }
+
         }
+
+
+
 
     }
     public  void setBorderColor(String color){
